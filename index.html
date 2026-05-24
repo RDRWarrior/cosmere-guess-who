@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cosmere Guess Who</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <main class="app">
+            <h1>Cosmere Guess Who</h1>
+
+            <section class="setup-panel" id="entryPanel">
+                <button id="createRoomButton">Create Room</button>
+
+                <div class="join-row">
+                    <input id="roomCodeInput" type="text" placeholder="Room Code" />
+                    <button id="joinRoomButton">Join Room</button>
+                </div>
+            </section>
+
+            <section class="lobby-panel hidden" id="lobbyPanel">
+                <h2>Lobby</h2>
+
+                <p><strong>Room Code:</strong> <span id="lobbyRoomCode">----</span></p>
+
+                <div class="lobby-box">
+                    <h3>Players</h3>
+                    <p id="lobbyPlayerOne">Player 1: Waiting...</p>
+                    <p id="lobbyPlayerTwo">Player 2: Waiting...</p>
+                </div>
+
+                <div class="lobby-box">
+                    <h3>Settings</h3>
+
+                    <div class="setting-row">
+                        <label for="lobbyPlayerName">Your Name</label>
+                        <input id="lobbyPlayerName" type="text" value="Player 1" />
+                    </div>
+
+                    <div class="setting-row">
+                        <label for="lobbyBoardSize">Board Size</label>
+                        <select id="lobbyBoardSize">
+                            <option value="4">2 x 2</option>
+                            <option value="9">3 x 3</option>
+                            <option value="16" selected>4 x 4</option>
+                            <option value="25">5 x 5</option>
+                            <option value="36">6 x 6</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="startGameButton">Start Game</button>
+            </section>
+
+            <section class="game-panel hidden" id="gamePanel">
+                <div class="top-bar">
+                    <p><strong>You are:</strong> <span id="secretCharacter">?</span></p>
+                    <p><strong>Current turn:</strong> <span id="currentTurn">Player 1</span></p>
+                </div>
+
+                <div id="board" class="board"></div>
+
+                <div class="game-buttons">
+                    <button id="endTurnButton">End Turn</button>
+                </div>
+            </section>
+
+            <section class="results-panel hidden" id="resultsPanel">
+                <h2>Game Over</h2>
+                <p id="resultMessage">Result goes here.</p>
+                <button id="returnToLobbyButton">Return to Lobby</button>
+            </section>
+        </main>
+
+        <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
+        <script src="firebaseConfig.js"></script>
+        <script src="characters.js"></script>
+        <script src="app.js"></script>
+    </body>
+</html>
