@@ -82,6 +82,19 @@
 
                 <div id="board" class="board"></div>
 
+                <div id="characterInfoPanel" class="character-info hidden">
+                    <h3 id="infoCharacterName">Character</h3>
+                    <p><strong>Source deck:</strong> <span id="infoCharacterDeck">?</span></p>
+
+                     <iframe
+                        id="infoWikiFrame"
+                        src=""
+                        style="width: 100%; height: 500px; border: 1px solid white;"
+                    ></iframe>
+                    
+                    <button id="closeInfoButton">Close</button>
+                </div>
+
                 <div class="game-buttons">
                     <button id="endTurnButton">End Turn</button>
                 </div>
@@ -90,6 +103,7 @@
             <section class="results-panel hidden" id="resultsPanel">
                 <h2>Game Over</h2>
                 <p id="resultMessage">Result goes here.</p>
+                <button id="playAgainButton">Play Again</button>
                 <button id="returnToLobbyButton">Return to Lobby</button>
             </section>
         </main>

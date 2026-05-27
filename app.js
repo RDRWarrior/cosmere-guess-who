@@ -37,7 +37,20 @@ const leaveRoomButton = document.getElementById("leaveRoomButton");
 
 const deckCheckboxes = document.querySelectorAll(".deck-checkbox");
 
+const playAgainButton = document.getElementById("playAgainButton");
+
+const characterInfoPanel = document.getElementById("characterInfoPanel");
+const infoCharacterName = document.getElementById("infoCharacterName");
+const infoCharacterDeck = document.getElementById("infoCharacterDeck");
+const closeInfoButton = document.getElementById("closeInfoButton");
+
+const infoWikiFrame = document.getElementById("infoWikiFrame");
+
 lobbyPlayerNameInput.addEventListener("input", updatePlayerName);
+
+playAgainButton.addEventListener("click", playAgain);
+
+closeInfoButton.addEventListener("click", closeCharacterInfo);
 
 let playerOneName = "Player 1";
 let playerTwoName = "Player 2";
@@ -206,7 +219,7 @@ function listenToRoom() {
             playerTwoSecret = roomData.playerTwoSecret;
             currentTurn = roomData.currentTurn || 1;
 
-            gameOver = roomData.gameOver || false;
+            gameOver = roomData.gameOver || false;   
 
             playerOneFlippedCards = roomData.playerOneFlippedCards || [];
             playerTwoFlippedCards = roomData.playerTwoFlippedCards || [];
@@ -224,6 +237,7 @@ function listenToRoom() {
 
             if (gameOver) {
                 resultMessageText.textContent = roomData.resultMessage || "Game over.";
+                playAgainButton.style.display = isHost ? "inline-block" : "none";
                 gamePanel.classList.add("hidden");
                 resultsPanel.classList.remove("hidden");
             }
@@ -380,6 +394,24 @@ function isMyTurn() {
     return currentTurn === getMyPlayerNumber();
 }
 
+function showCharacterInfo(character) {
+    infoCharacterName.textContent = character.displayName;
+    infoCharacterDeck.textContent = character.sourceDeck || "Unknown";
+
+    const wikiName = character.displayName
+        .replaceAll(" ", "_")
+        .replaceAll("'", "%27");
+
+    infoWikiFrame.src = `https://coppermind.net/wiki/${wikiName}`;
+
+    characterInfoPanel.classList.remove("hidden");
+}
+
+function closeCharacterInfo() {
+    characterInfoPanel.classList.add("hidden");
+    infoWikiFrame.src = "";
+}
+
 function renderBoard() {
     boardElement.innerHTML = "";
 
@@ -396,8 +428,15 @@ function renderBoard() {
             card.classList.add("flipped");
         }
         
-        const nameText = document.createElement("div");
+        const nameText = document.createElement("button");
+        nameText.classList.add("card-name-button");
         nameText.textContent = characterName;
+
+        nameText.addEventListener("click", (event) => {
+            event.stopPropagation();
+            showCharacterInfo(character);
+        });
+
         card.appendChild(nameText);
 
         const actions = document.createElement("div");
@@ -423,6 +462,13 @@ function renderBoard() {
         });
 
         flipButton.disabled = !isMyTurn() || gameOver;
+
+        const infoButton = document.createElement("button");
+        infoButton.textContent = "Info";
+        infoButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            showCharacterInfo(character);
+        });
         
         actions.appendChild(guessButton);
         actions.appendChild(flipButton);
@@ -565,6 +611,22 @@ function leaveRoom() {
     gamePanel.classList.add("hidden");
     resultsPanel.classList.add("hidden");
     entryPanel.classList.remove("hidden");
+}
+
+function playAgain() {
+    if (!isHost) return;
+
+    database.ref("rooms/" + currentRoomCode).update({
+        gameStarted: false,
+        gameOver: false,
+        resultMessage: "",
+        currentTurn: 1,
+        chosenCharacters: null,
+        playerOneSecret: "",
+        playerTwoSecret: "",
+        playerOneFlippedCards: [],
+        playerTwoFlippedCards: []
+    });
 }
 
 function returnToLobby() {
