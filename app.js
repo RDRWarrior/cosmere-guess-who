@@ -33,6 +33,10 @@ const returnToLobbyButton = document.getElementById("returnToLobbyButton");
 
 const lobbyPlayerNameInput = document.getElementById("lobbyPlayerName");
 
+const leaveRoomButton = document.getElementById("leaveRoomButton");
+
+const deckCheckboxes = document.querySelectorAll(".deck-checkbox");
+
 lobbyPlayerNameInput.addEventListener("input", updatePlayerName);
 
 let playerOneName = "Player 1";
@@ -49,6 +53,9 @@ let playerOneSecret = "";
 let playerTwoSecret = "";
 
 let chosenCharacters = [];
+
+let selectedDecks = ["Scadrial"];
+
 let playerOneFlippedCards = [];
 let playerTwoFlippedCards = [];
 
@@ -63,6 +70,14 @@ startGameButton.addEventListener("click", startGame);
 
 returnToLobbyButton.addEventListener("click", returnToLobby);
 
+leaveRoomButton.addEventListener("click", leaveRoom);
+
+lobbyBoardSizeSelect.addEventListener("change", updateBoardSize);
+
+deckCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", updateSelectedDecks);
+});
+
 function createRoom() {
     currentRoomCode = generateRoomCode();
 
@@ -75,6 +90,7 @@ function createRoom() {
         playerOneName: playerOneName,
         playerTwoName: playerTwoName,
         boardSize: 16,
+        selectedDecks: ["Scadrial"],
         gameStarted: false
     };
 
@@ -136,6 +152,8 @@ function showLobby() {
 
     //startGameButton.style.display = isHost ? "block" : "none";
 
+    setupDisconnectHandling();
+
     listenToRoom();
 }
 
@@ -144,6 +162,16 @@ function listenToRoom() {
         const roomData = snapshot.val();
 
         if (!roomData) {
+            alert("The other player has left the game.");
+
+            currentRoomCode = "";
+            isHost = false;
+
+            lobbyPanel.classList.add("hidden");
+            gamePanel.classList.add("hidden");
+            resultsPanel.classList.add("hidden");
+            entryPanel.classList.remove("hidden");
+
             return;
         }
 
@@ -163,6 +191,15 @@ function listenToRoom() {
 
         lobbyBoardSizeSelect.value = roomData.boardSize;
 
+        lobbyBoardSizeSelect.disabled = !isHost;
+
+        selectedDecks = roomData.selectedDecks || ["Scadrial"];
+
+        deckCheckboxes.forEach((checkbox) => {
+            checkbox.checked = selectedDecks.includes(checkbox.value);
+            checkbox.disabled = !isHost;
+        });
+
         if (roomData.gameStarted && roomData.chosenCharacters) {
             chosenCharacters = roomData.chosenCharacters;
             playerOneSecret = roomData.playerOneSecret;
@@ -176,7 +213,7 @@ function listenToRoom() {
 
             currentTurnText.textContent = currentTurn === 1 ? playerOneName : playerTwoName;
 
-            secretCharacterText.textContent = isHost ? playerOneSecret : playerTwoSecret;
+            secretCharacterText.textContent = getCharacterDisplayNameById(isHost ? playerOneSecret : playerTwoSecret);
 
             setBoardColumns(roomData.boardSize);
             renderBoard();
@@ -191,7 +228,34 @@ function listenToRoom() {
                 resultsPanel.classList.remove("hidden");
             }
         }
+
+        if (!roomData.gameStarted && !roomData.gameOver) {
+            gamePanel.classList.add("hidden");
+            resultsPanel.classList.add("hidden");
+
+            if (currentRoomCode) {
+                lobbyPanel.classList.remove("hidden");
+            }
+        }
     });
+}
+
+function setupDisconnectHandling() {
+    const roomRef = database.ref("rooms/" + currentRoomCode);
+
+    if (isHost) {
+        roomRef.onDisconnect().remove();
+    } else {
+        roomRef.onDisconnect().update({
+            playerTwoName: "Waiting...",
+            gameStarted: false,
+            gameOver: false,
+            resultMessage: "",
+            chosenCharacters: null,
+            playerTwoSecret: "",
+            playerTwoFlippedCards: []
+        });
+    }
 }
 
 function updateTurnControls() {
@@ -222,6 +286,30 @@ function updatePlayerName() {
     }
 }
 
+function updateSelectedDecks() {
+    if (!isHost) return;
+
+    selectedDecks = Array.from(deckCheckboxes)
+        .filter((checkbox) => checkbox.checked)
+        .map((checkbox) => checkbox.value);
+
+    if (selectedDecks.length === 0) {
+        selectedDecks = ["Scadrial"];
+    }
+
+    database.ref("rooms/" + currentRoomCode).update({
+        selectedDecks: selectedDecks
+    });
+}
+
+function updateBoardSize() {
+    if (!isHost) return;
+
+    database.ref("rooms/" + currentRoomCode).update({
+        boardSize: parseInt(lobbyBoardSizeSelect.value)
+    });
+}
+
 function startGame() {
     boardElement.innerHTML = "";
 
@@ -247,6 +335,8 @@ function startGame() {
 
     const boardSize = parseInt(lobbyBoardSizeSelect.value);
 
+    updateSelectedDecks();
+
     chosenCharacters = getRandomCharacters(boardSize);
     playerOneFlippedCards = [];
     playerTwoFlippedCards = [];
@@ -267,7 +357,7 @@ function startGame() {
         resultMessage: ""
     });
 
-    secretCharacterText.textContent = currentTurn === 1 ? playerOneSecret : playerTwoSecret;
+    secretCharacterText.textContent = getCharacterDisplayNameById(currentTurn === 1 ? playerOneSecret : playerTwoSecret);
 
     setBoardColumns(boardSize);
 
@@ -295,11 +385,14 @@ function renderBoard() {
 
     const myFlippedCards = isHost ? playerOneFlippedCards : playerTwoFlippedCards;
 
-    chosenCharacters.forEach((characterName) => {
+    chosenCharacters.forEach((character) => {
+        const characterId = character.id;
+        const characterName = character.displayName;
+
         const card = document.createElement("div");
         card.classList.add("card");
         
-        if (myFlippedCards.includes(characterName)) {
+        if (myFlippedCards.includes(characterId)) {
             card.classList.add("flipped");
         }
         
@@ -314,18 +407,19 @@ function renderBoard() {
         guessButton.textContent = "Guess";
         guessButton.addEventListener("click", (event) => {
             event.stopPropagation();
-            guessCharacter(characterName);
+            guessCharacter(characterId);
         });
 
         guessButton.disabled = !isMyTurn() || gameOver;
         
         const flipButton = document.createElement("button");
-        
-        flipButton.textContent = myFlippedCards.includes(characterName) ? "Restore" : "Cross Out";
+        flipButton.textContent = myFlippedCards.includes(characterId)
+            ? "Restore"
+            : "Cross Out";
         
         flipButton.addEventListener("click", (event) => {
             event.stopPropagation();
-            toggleFlippedCard(characterName);
+            toggleFlippedCard(characterId);
         });
 
         flipButton.disabled = !isMyTurn() || gameOver;
@@ -363,21 +457,50 @@ function toggleFlippedCard(characterName) {
 }
 
 function getRandomCharacters(amount) {
-    const shuffled = [...CHARACTERS].sort(() => Math.random() - 0.5);
-    
-    return shuffled.slice(0, amount);
+    const eligibleCharacters = CHARACTERS
+        .map((character) => {
+            const matchingDecks = selectedDecks.filter((deck) =>
+                character.namesByDeck[deck]
+            );
+
+            if (matchingDecks.length === 0) {
+                return null;
+            }
+
+            const randomDeck =
+                matchingDecks[Math.floor(Math.random() * matchingDecks.length)];
+
+            return {
+                id: character.id,
+                displayName: character.namesByDeck[randomDeck],
+                sourceDeck: randomDeck
+            };
+        })
+        .filter((character) => character !== null);
+
+    const maxAmount = Math.min(amount, eligibleCharacters.length);
+
+    const shuffled = [...eligibleCharacters].sort(() => Math.random() - 0.5);
+
+    return shuffled.slice(0, maxAmount);
 }
 
 function getRandomCharacterFromBoard(boardCharacters) {
-    return boardCharacters[
-        Math.floor(Math.random() * boardCharacters.length)
-    ];
+    const character =
+        boardCharacters[Math.floor(Math.random() * boardCharacters.length)];
+
+    return character.id;
+}
+
+function getCharacterDisplayNameById(characterId) {
+    const character = chosenCharacters.find((c) => c.id === characterId);
+
+    return character ? character.displayName : characterId;
 }
 
 function setBoardColumns(boardSize) {
-    const columns = Math.sqrt(boardSize);
-    
-    boardElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+    boardElement.style.gridTemplateColumns =
+        "repeat(auto-fit, minmax(110px, 1fr))";
 }
 
 function endTurn() {
@@ -418,7 +541,46 @@ function guessCharacter(characterName) {
     });
 }
 
-function returnToLobby() {
+function leaveRoom() {
+    if (!currentRoomCode) return;
+
+    if (isHost) {
+        database.ref("rooms/" + currentRoomCode).remove();
+    } else {
+        database.ref("rooms/" + currentRoomCode).update({
+            playerTwoName: "Waiting...",
+            gameStarted: false,
+            gameOver: false,
+            resultMessage: "",
+            chosenCharacters: null,
+            playerTwoSecret: "",
+            playerTwoFlippedCards: []
+        });
+    }
+
+    currentRoomCode = "";
+    isHost = false;
+
+    lobbyPanel.classList.add("hidden");
+    gamePanel.classList.add("hidden");
     resultsPanel.classList.add("hidden");
+    entryPanel.classList.remove("hidden");
+}
+
+function returnToLobby() {
+    database.ref("rooms/" + currentRoomCode).update({
+        gameStarted: false,
+        gameOver: false,
+        resultMessage: "",
+        currentTurn: 1,
+        chosenCharacters: null,
+        playerOneSecret: "",
+        playerTwoSecret: "",
+        playerOneFlippedCards: [],
+        playerTwoFlippedCards: []
+    });
+
+    resultsPanel.classList.add("hidden");
+    gamePanel.classList.add("hidden");
     lobbyPanel.classList.remove("hidden");
 }

@@ -42,14 +42,36 @@
                         <label for="lobbyBoardSize">Board Size</label>
                         <select id="lobbyBoardSize">
                             <option value="4">2 x 2</option>
-                            <option value="9">3 x 3</option>
                             <option value="16" selected>4 x 4</option>
-                            <option value="25">5 x 5</option>
-                            <option value="36">6 x 6</option>
+                            <option value="64">8 x 8</option>
+                            <option value="256">16 x 16</option>
+                            <option value="1024">32 x 32</option>
                         </select>
                     </div>
                 </div>
+
+                <div class="lobby-box">
+                    <h3>Decks</h3>
+                    <div class="deck-grid">
+
+                        <label><input type="checkbox" class="deck-checkbox" value="Scadrial" checked /> Scadrial</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Roshar" /> Roshar</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Sel" /> Sel</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Nalthis" /> Nalthis</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Taldain" /> Taldain</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Lumar" /> Lumar</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Komashi" /> Komashi</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Canticle" /> Canticle</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Emberdark" /> Emberdark</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Threnody" /> Threnody</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Yolen" /> Yolen</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Shards" /> Shards</label>
+                        <label><input type="checkbox" class="deck-checkbox" value="Worldhoppers" /> Worldhoppers</label>
+                    </div>
+                </div>
+
                 <button id="startGameButton">Start Game</button>
+                <button id="leaveRoomButton">Leave Room</button>
             </section>
 
             <section class="game-panel hidden" id="gamePanel">
