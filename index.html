@@ -46,6 +46,8 @@
                             <option value="64">8 x 8</option>
                             <option value="256">16 x 16</option>
                             <option value="1024">32 x 32</option>
+                            <option value="4096">64 x 64</option>
+                            <option value="10000">100 x 100</option>
                         </select>
                     </div>
                 </div>
@@ -86,6 +88,19 @@
                     <h3 id="infoCharacterName">Character</h3>
                     <p><strong>Source deck:</strong> <span id="infoCharacterDeck">?</span></p>
 
+                    <img
+                        id="infoCharacterImage"
+                        src=""
+                        alt="Character Image"
+                        style="
+                            max-width: 250px;
+                            max-height: 250px;
+                            display: none;
+                            margin-bottom: 1rem;
+                            border: 2px solid white;
+                        "
+                    />
+
                      <iframe
                         id="infoWikiFrame"
                         src=""
@@ -104,8 +119,30 @@
                 <h2>Game Over</h2>
                 <p id="resultMessage">Result goes here.</p>
                 <button id="playAgainButton">Play Again</button>
-                <button id="returnToLobbyButton">Return to Lobby</button>
+                <button id="returnToLobbyButton">Leave Game</button>
             </section>
+
+            <footer class="site-footer">
+                <p>
+                    Made by
+                    <a href="https://rdrwarrior.github.io/" target="_blank" rel="noopener noreferrer">
+                        ReaderWarrior
+                    </a>
+                </p>
+
+                <p>
+                    Most character art taken from (with permission):
+                    <a href=https://www.instagram.com/lepoude__/" target="_blank" rel="noopener noreferrer">
+                        Lepoude
+                    </a>
+                </p>
+
+                <p class="legal-note">
+                    This is a free fan-made game. Guess Who? belongs to its respective rights holders.
+                    Cosmere characters and related materials belong to Brandon Sanderson / Dragonsteel.
+                    This project is not official or affiliated with those rights holders.
+                </p>
+            </footer>
         </main>
 
         <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>

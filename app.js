@@ -46,6 +46,8 @@ const closeInfoButton = document.getElementById("closeInfoButton");
 
 const infoWikiFrame = document.getElementById("infoWikiFrame");
 
+const infoCharacterImage = document.getElementById("infoCharacterImage");
+
 lobbyPlayerNameInput.addEventListener("input", updatePlayerName);
 
 playAgainButton.addEventListener("click", playAgain);
@@ -398,7 +400,14 @@ function showCharacterInfo(character) {
     infoCharacterName.textContent = character.displayName;
     infoCharacterDeck.textContent = character.sourceDeck || "Unknown";
 
-    const wikiName = character.displayName
+    if (character.image) {
+        infoCharacterImage.src = character.image;
+        infoCharacterImage.style.display = "block";
+    } else {
+        infoCharacterImage.style.display = "none";
+    }
+
+    const wikiName = (character.wikiPage || character.displayName)
         .replaceAll(" ", "_")
         .replaceAll("'", "%27");
 
@@ -438,6 +447,19 @@ function renderBoard() {
         });
 
         card.appendChild(nameText);
+
+        const cardImage = document.createElement("img");
+        cardImage.classList.add("card-image");
+
+        if (character.image) {
+            cardImage.src = character.image;
+            cardImage.alt = characterName;
+        } else {
+            cardImage.src = "images/placeholder.png";
+            cardImage.alt = "No image available";
+        }
+
+        card.appendChild(cardImage);
 
         const actions = document.createElement("div");
         actions.classList.add("card-actions");
@@ -519,7 +541,9 @@ function getRandomCharacters(amount) {
             return {
                 id: character.id,
                 displayName: character.namesByDeck[randomDeck],
-                sourceDeck: randomDeck
+                sourceDeck: randomDeck,
+                image: character.imagesByDeck?.[randomDeck] || character.image || "images/placeholder.png",
+                wikiPage: character.wikiPage || null
             };
         })
         .filter((character) => character !== null);
@@ -563,6 +587,16 @@ function endTurn() {
 function guessCharacter(characterName) {
     if (gameOver) return;
     if (!isMyTurn()) return;
+
+    const guessedCharacter = getCharacterDisplayNameById(characterName);
+
+    const confirmed = confirm(
+        `Guess ${guessedCharacter}?\n\nIf correct, you win.\nIf wrong, you lose.`
+    );
+
+    if (!confirmed) {
+        return;
+    }
 
     const opponentSecret =
         currentTurn === 1 ? playerTwoSecret : playerOneSecret;
@@ -630,19 +664,28 @@ function playAgain() {
 }
 
 function returnToLobby() {
-    database.ref("rooms/" + currentRoomCode).update({
-        gameStarted: false,
-        gameOver: false,
-        resultMessage: "",
-        currentTurn: 1,
-        chosenCharacters: null,
-        playerOneSecret: "",
-        playerTwoSecret: "",
-        playerOneFlippedCards: [],
-        playerTwoFlippedCards: []
-    });
+    database.ref("rooms/" + currentRoomCode).off();
+
+    if (isHost) {
+        database.ref("rooms/" + currentRoomCode).remove();
+    } else {
+        database.ref("rooms/" + currentRoomCode).update({
+            playerTwoName: "Waiting...",
+            gameStarted: false,
+            gameOver: false,
+            resultMessage: "",
+            chosenCharacters: null,
+            playerTwoSecret: "",
+            playerTwoFlippedCards: []
+        });
+    }
+
+    currentRoomCode = "";
+    isHost = false;
 
     resultsPanel.classList.add("hidden");
     gamePanel.classList.add("hidden");
-    lobbyPanel.classList.remove("hidden");
+    lobbyPanel.classList.add("hidden");
+
+    entryPanel.classList.remove("hidden");
 }
