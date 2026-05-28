@@ -481,6 +481,12 @@ function renderBoard() {
         flipButton.textContent = myFlippedCards.includes(characterId)
             ? "Restore"
             : "Cross Out";
+
+        if (myFlippedCards.includes(characterId)) {
+            flipButton.classList.add("restore-button");
+        } else {
+            flipButton.classList.remove("restore-button");
+        }
         
         flipButton.addEventListener("click", (event) => {
             event.stopPropagation();

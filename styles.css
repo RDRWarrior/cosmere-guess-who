@@ -113,6 +113,127 @@ h1 {
   justify-content: space-between;
 }
 
+.character-info-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  background-color: rgba(0, 0, 0, 0.75);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.character-info-modal.hidden {
+  display: none;
+}
+
+.character-info-card {
+  position: relative;
+
+  width: min(1200px, 95vw);
+  height: min(760px, 90vh);
+
+  background-color: #111827;
+  border: 1px solid #374151;
+  border-radius: 16px;
+
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  background-color: #374151;
+  font-size: 24px;
+  line-height: 1;
+
+  width: 42px;
+  height: 42px;
+
+  padding: 0;
+  border-radius: 999px;
+}
+
+.modal-close-button:hover {
+  background-color: #ef4444;
+}
+
+.character-info-header {
+  padding-right: 52px;
+  margin-bottom: 12px;
+}
+
+.character-info-header h3 {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+
+.character-info-header p {
+  margin: 0;
+  color: #d1d5db;
+}
+
+.character-info-content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+
+  min-height: 0;
+  flex: 1;
+}
+
+.character-info-left {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 12px;
+
+  padding: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.character-info-left img {
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.character-info-right iframe {
+  width: 100%;
+  height: 100%;
+
+  border: 1px solid #374151;
+  border-radius: 12px;
+
+  background-color: white;
+}
+
+@media (max-width: 800px) {
+  .character-info-card {
+    height: 92vh;
+  }
+
+  .character-info-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: 220px 1fr;
+  }
+}
+
 .card > div:first-child {
   font-size: 16px;
   line-height: 1.2;
@@ -123,11 +244,28 @@ h1 {
   border-color: #60a5fa;
 }
 
-.card.flipped {
-  opacity: 0.3;
+.card.flipped .card-name-button,
+.card.flipped .card-image {
+  opacity: 0.35;
+}
+
+.card.flipped .card-name-button {
   text-decoration: line-through;
 }
 
+.card.flipped button {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.card.flipped .restore-button {
+  background-color: #16a34a;
+  color: white;
+}
+
+.card.flipped .restore-button:hover {
+  background-color: #22c55e;
+}
 button {
   background-color: #2563eb;
   color: white;
