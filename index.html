@@ -13,6 +13,10 @@
             <section class="setup-panel" id="entryPanel">
                 <button id="createRoomButton">Create Room</button>
 
+                <div class="or-divider">
+                    <span>OR</span>
+                </div>
+
                 <div class="join-row">
                     <input id="roomCodeInput" type="text" placeholder="Room Code" />
                     <button id="joinRoomButton">Join Room</button>
@@ -55,25 +59,116 @@
                 <div class="lobby-box">
                     <h3>Decks</h3>
                     <div class="deck-grid">
+                        <label class="deck-tile">
+                            <img src="images/decks/scadrial.png" alt="Scadrial" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Scadrial" checked />
+                                <span>Scadrial</span>
+                            </div>
+                        </label>
 
-                        <label><input type="checkbox" class="deck-checkbox" value="Scadrial" checked /> Scadrial</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Roshar" /> Roshar</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Sel" /> Sel</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Nalthis" /> Nalthis</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Taldain" /> Taldain</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Lumar" /> Lumar</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Komashi" /> Komashi</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Canticle" /> Canticle</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Emberdark" /> Emberdark</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Threnody" /> Threnody</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Yolen" /> Yolen</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Shards" /> Shards</label>
-                        <label><input type="checkbox" class="deck-checkbox" value="Worldhoppers" /> Worldhoppers</label>
+                        <label class="deck-tile">
+                            <img src="images/decks/roshar.png" alt="Roshar" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Roshar" />
+                                <span>Roshar</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/sel.png" alt="Sel" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Sel" />
+                                <span>Sel</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/nalthis.png" alt="Nalthis" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Nalthis" />
+                                <span>Nalthis</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/taldain.png" alt="Taldain" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Taldain" />
+                                <span>Taldain</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/lumar.png" alt="Lumar" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Lumar" />
+                                <span>Lumar</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/komashi.png" alt="Komashi" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Komashi" />
+                                <span>Komashi</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/canticle.png" alt="Canticle" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Canticle" />
+                                <span>Canticle</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/emberdark.png" alt="Emberdark" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Emberdark" />
+                                <span>Emberdark</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/threnody.png" alt="Threnody" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Threnody" />
+                                <span>Threnody</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/yolen.png" alt="Yolen" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Yolen" />
+                                <span>Yolen</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/shards.png" alt="Shards" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Shards" />
+                                <span>Shards</span>
+                            </div>
+                        </label>
+
+                        <label class="deck-tile">
+                            <img src="images/decks/worldhoppers.png" alt="Worldhoppers" />
+                            <div class="deck-tile-top">
+                                <input type="checkbox" class="deck-checkbox" value="Worldhoppers" />
+                                <span>Worldhoppers</span>
+                            </div>
+                        </label>
                     </div>
                 </div>
 
-                <button id="startGameButton">Start Game</button>
-                <button id="leaveRoomButton">Leave Room</button>
+                <div class="lobby-actions">
+                    <button id="startGameButton">Start Game</button>
+                    <button id="leaveRoomButton">Leave Room</button>
+                </div>
             </section>
 
             <section class="game-panel hidden" id="gamePanel">
@@ -132,7 +227,7 @@
 
                 <p>
                     Most character art taken from (with permission):
-                    <a href=https://www.instagram.com/lepoude__/" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.instagram.com/lepoude__/" target="_blank" rel="noopener noreferrer">
                         Lepoude
                     </a>
                 </p>

@@ -459,6 +459,10 @@ function renderBoard() {
             cardImage.alt = "No image available";
         }
 
+        cardImage.onerror = () => {
+            cardImage.src = "images/placeholder.png";
+        };
+
         card.appendChild(cardImage);
 
         const actions = document.createElement("div");
@@ -485,12 +489,7 @@ function renderBoard() {
 
         flipButton.disabled = !isMyTurn() || gameOver;
 
-        const infoButton = document.createElement("button");
-        infoButton.textContent = "Info";
-        infoButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            showCharacterInfo(character);
-        });
+        
         
         actions.appendChild(guessButton);
         actions.appendChild(flipButton);
@@ -569,8 +568,10 @@ function getCharacterDisplayNameById(characterId) {
 }
 
 function setBoardColumns(boardSize) {
-    boardElement.style.gridTemplateColumns =
-        "repeat(auto-fit, minmax(110px, 1fr))";
+    const boardWidth = Math.sqrt(boardSize);
+    const columns = Math.min(boardWidth, 8);
+
+    boardElement.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
 }
 
 function endTurn() {

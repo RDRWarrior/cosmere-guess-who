@@ -41,7 +41,7 @@ const CHARACTERS = [
     { id: "cett", namesByDeck: { Scadrial: "Ashweather Cett" }, image: "images/cett.png" },
     { id: "penrod", namesByDeck: { Scadrial: "Ferson Penrod" } },
     { id: "alendi", namesByDeck: { Scadrial: "Alendi" } },
-    { id: "tindwyl", namesByDeck: { Scadrial: "Tindwyl" }, image: "images/vin.png" },
+    { id: "tindwyl", namesByDeck: { Scadrial: "Tindwyl" }, image: "images/tindwyl.png" },
     { id: "amaranta", namesByDeck: { Scadrial: "Amaranta" } },
     { id: "allrianne", namesByDeck: { Scadrial: "Allrianne Cett" }, image: "images/allrianne.png" },
     { id: "gneorndin", namesByDeck: { Scadrial: "Gneorndin Cett" } },
