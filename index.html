@@ -46,7 +46,8 @@
                         <label for="lobbyBoardSize">Board Size</label>
                         <select id="lobbyBoardSize">
                             <option value="4">2 x 2</option>
-                            <option value="16" selected>4 x 4</option>
+                            <option value="16"> 4 x 4</option>
+                            <option value="36" selected>6 x 6</option>
                             <option value="64">8 x 8</option>
                             <option value="256">16 x 16</option>
                             <option value="1024">32 x 32</option>
@@ -165,6 +166,24 @@
                     </div>
                 </div>
 
+                <details class="rules-box">
+                    <summary>Rules</summary>
+                    <ul>
+                        <li>Host starts first.</li>
+                        <li>You must only use yes or no questions to narrow down your opponent's cognitive aspect.</li>
+                        <li>Use 'Cross Out' to remove characters from your own board and use 'Restore' if you crossed someone out by mistake.</li>
+                        <li>When your turn is over, you must click 'end turn'.</li>
+                        <li>A note section is at the bottom of the page to help you remember what questions you have asked.</li>
+                        <li>You may NOT ask a question and then guess. A guess must be a turn. But be warned, if you guess wrong, you lose.</li>
+                        <li>Spectators can watch the game but cannot make moves.</li>
+                        <li>Any character referenced in a deck's book series may be in said deck - ie, Cultivation mentioned in Secret History allows her to be in the Mistborn deck.</li>
+                        <li>A character's name may be different depending on which deck that card was taken from - ie, Thaidakar. If they are in two decks you have picked, it will be randomized on which is grabbed.</li>
+                        <li>Spoilers may be hard to avoid, please keep that in mind if playing and not fully Cosmerically aware.</li>
+                        <li>If you do not know who a character is, click their name for a hint!</li>
+                        <li>Most importantly, HAVE FUN :D</li>
+                    </ul>
+                </details>
+
                 <div class="lobby-actions">
                     <button id="startGameButton">Start Game</button>
                     <button id="leaveRoomButton">Leave Room</button>
@@ -173,11 +192,47 @@
 
             <section class="game-panel hidden" id="gamePanel">
                 <div class="top-bar">
-                    <p><strong>You are:</strong> <span id="secretCharacter">?</span></p>
+                    <div class="secret-card" id="secretCard">
+                        <img id="secretCharacterImage" src="images/placeholder.png" alt="Your secret character" />
+                        <div>
+                            <strong>You are:</strong>
+                            <button id="secretCharacterButton" class="secret-character-button">?</button>
+                        </div>
+                    </div>
                     <p><strong>Current turn:</strong> <span id="currentTurn">Player 1</span></p>
                 </div>
 
-                <div id="board" class="board"></div>
+                <div class="spectator-layout" id="spectatorLayout">
+                    <aside class="spectator-player-panel player-one-panel" id="spectatorPlayerOnePanel">
+                        <h3>Player 1</h3>
+                        <h2 id="spectatorPlayerOneName">Host</h2>
+                        <img id="spectatorPlayerOneImage" src="images/placeholder.png" alt="Player 1 secret" />
+                        <p>Secret Character</p>
+                        <h3 id="spectatorPlayerOneSecret">?</h3>
+                        <p>Crossed Out: <strong id="spectatorPlayerOneCrossedCount">0</strong></p>
+                    </aside>
+
+                    <div class="game-center">
+                        <div id="board" class="board"></div>
+
+                        <div class="spectator-legend hidden" id="spectatorLegend">
+                            <span class="p1-x">✕</span> Player 1 crossed out
+                            <span class="p2-x">✕</span> Player 2 crossed out
+                        </div>
+
+                        <h3 id="crossedOutTitle">Crossed Out</h3>
+                        <div id="crossedOutBoard" class="crossed-out-board"></div>
+                    </div>
+
+                    <aside class="spectator-player-panel player-two-panel" id="spectatorPlayerTwoPanel">
+                        <h3>Player 2</h3>
+                        <h2 id="spectatorPlayerTwoName">Guest</h2>
+                        <img id="spectatorPlayerTwoImage" src="images/placeholder.png" alt="Player 2 secret" />
+                        <p>Secret Character</p>
+                        <h3 id="spectatorPlayerTwoSecret">?</h3>
+                        <p>Crossed Out: <strong id="spectatorPlayerTwoCrossedCount">0</strong></p>
+                    </aside>
+                </div>
 
                 <div id="characterInfoPanel" class="character-info-modal hidden">
                     <div class="character-info-card">
@@ -211,6 +266,12 @@
                 <div class="game-buttons">
                     <button id="endTurnButton">End Turn</button>
                 </div>
+
+                <div class="notes-panel">
+                    <h3>Question Notes</h3>
+                    <textarea id="questionNotes" placeholder="Track questions here..."></textarea>
+                </div>
+
             </section>
 
             <section class="results-panel hidden" id="resultsPanel">
