@@ -26,7 +26,11 @@
             <section class="lobby-panel hidden" id="lobbyPanel">
                 <h2>Lobby</h2>
 
-                <p><strong>Room Code:</strong> <span id="lobbyRoomCode">----</span></p>
+                <p class="room-code-row">
+                    <strong>Room Code:</strong>
+                    <span id="lobbyRoomCode">----</span>
+                    <button id="copyRoomCodeButton" type="button">Copy</button>
+                </p>
 
                 <div class="lobby-box">
                     <h3>Players</h3>
@@ -202,6 +206,12 @@
                     <p><strong>Current turn:</strong> <span id="currentTurn">Player 1</span></p>
                 </div>
 
+                <div class="game-info-bar" id="gameInfoBar">
+                    <span><strong>Board:</strong> <span id="gameBoardSizeLabel">?</span></span>
+                    <span><strong>Characters:</strong> <span id="gameCharacterCount">?</span></span>
+                    <span><strong>Decks:</strong> <span id="gameDeckList">?</span></span>
+                </div>
+
                 <div class="spectator-layout" id="spectatorLayout">
                     <aside class="spectator-player-panel player-one-panel" id="spectatorPlayerOnePanel">
                         <h3>Player 1</h3>
@@ -263,6 +273,24 @@
                     </div>
                 </div>
 
+                <div id="guessConfirmModal" class="guess-confirm-modal hidden">
+                    <div class="guess-confirm-card">
+                        <h2>Confirm Guess</h2>
+
+                        <img id="guessConfirmImage" src="images/placeholder.png" alt="Guess character" />
+
+                        <h3 id="guessConfirmName">Character</h3>
+
+                        <p>If correct, you win.</p>
+                        <p>If wrong, your opponent wins.</p>
+
+                        <div class="guess-confirm-actions">
+                            <button id="confirmGuessButton">Confirm Guess</button>
+                            <button id="cancelGuessButton" class="secondary-button">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="game-buttons">
                     <button id="endTurnButton">End Turn</button>
                 </div>
@@ -277,8 +305,29 @@
             <section class="results-panel hidden" id="resultsPanel">
                 <h2>Game Over</h2>
                 <p id="resultMessage">Result goes here.</p>
-                <button id="playAgainButton">Play Again</button>
-                <button id="returnToLobbyButton">Leave Game</button>
+
+                <div class="results-secrets">
+                    <div class="result-secret-card player-one-result">
+                        <h2 id="resultPlayerOneStatus">WINNER</h2>
+                        <h3 id="resultPlayerOneName">Player 1</h3>
+                        <img id="resultPlayerOneImage" src="images/placeholder.png" alt="Player 1 secret" />
+                        <p id="resultPlayerOneSecret">?</p>
+                        <p class="result-score">Score: <span id="resultPlayerOneScore">0</span></p>
+                    </div>
+
+                    <div class="result-secret-card player-two-result">
+                        <h2 id="resultPlayerTwoStatus">LOSER</h2>
+                        <h3 id="resultPlayerTwoName">Player 2</h3>
+                        <img id="resultPlayerTwoImage" src="images/placeholder.png" alt="Player 2 secret" />
+                        <p id="resultPlayerTwoSecret">?</p>
+                        <p class="result-score">Score: <span id="resultPlayerTwoScore">0</span></p>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button id="playAgainButton">Play Again</button>
+                    <button id="returnToLobbyButton">Leave Game</button>
+                </div>
             </section>
 
             <footer class="site-footer">

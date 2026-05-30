@@ -73,6 +73,30 @@ const spectatorPlayerTwoSecret = document.getElementById("spectatorPlayerTwoSecr
 const spectatorPlayerOneCrossedCount = document.getElementById("spectatorPlayerOneCrossedCount");
 const spectatorPlayerTwoCrossedCount = document.getElementById("spectatorPlayerTwoCrossedCount");
 
+const copyRoomCodeButton = document.getElementById("copyRoomCodeButton");
+
+const gameBoardSizeLabel = document.getElementById("gameBoardSizeLabel");
+const gameCharacterCount = document.getElementById("gameCharacterCount");
+const gameDeckList = document.getElementById("gameDeckList");
+
+const guessConfirmModal = document.getElementById("guessConfirmModal");
+const guessConfirmImage = document.getElementById("guessConfirmImage");
+const guessConfirmName = document.getElementById("guessConfirmName");
+const confirmGuessButton = document.getElementById("confirmGuessButton");
+const cancelGuessButton = document.getElementById("cancelGuessButton");
+
+const resultPlayerOneName = document.getElementById("resultPlayerOneName");
+const resultPlayerTwoName = document.getElementById("resultPlayerTwoName");
+const resultPlayerOneImage = document.getElementById("resultPlayerOneImage");
+const resultPlayerTwoImage = document.getElementById("resultPlayerTwoImage");
+const resultPlayerOneSecret = document.getElementById("resultPlayerOneSecret");
+const resultPlayerTwoSecret = document.getElementById("resultPlayerTwoSecret");
+
+const resultPlayerOneScore = document.getElementById("resultPlayerOneScore");
+const resultPlayerTwoScore = document.getElementById("resultPlayerTwoScore");
+
+copyRoomCodeButton.addEventListener("click", copyRoomCode);
+
 questionNotes.addEventListener("input", saveQuestionNotes);
 
 secretCharacterButton.addEventListener("click", showSecretCharacterInfo);
@@ -106,6 +130,11 @@ let selectedDecks = ["Scadrial"];
 let playerOneFlippedCards = [];
 let playerTwoFlippedCards = [];
 
+let pendingGuessCharacterId = "";
+
+let playerOneWins = 0;
+let playerTwoWins = 0;
+
 createRoomButton.addEventListener("click", createRoom);
 joinRoomButton.addEventListener("click", joinRoom);
 
@@ -124,6 +153,9 @@ lobbyBoardSizeSelect.addEventListener("change", updateBoardSize);
 deckCheckboxes.forEach((checkbox) => {
     checkbox.addEventListener("change", updateSelectedDecks);
 });
+
+confirmGuessButton.addEventListener("click", confirmPendingGuess);
+cancelGuessButton.addEventListener("click", closeGuessConfirmModal);
 
 function createRoom() {
     currentRoomCode = generateRoomCode();
@@ -243,6 +275,9 @@ function listenToRoom() {
         playerOneName = roomData.playerOneName;
         playerTwoName = roomData.playerTwoName;
 
+        playerOneWins = roomData.playerOneWins || 0;
+        playerTwoWins = roomData.playerTwoWins || 0;
+
         lobbyPlayerOneText.textContent = `Player 1: ${playerOneName}`;
         lobbyPlayerTwoText.textContent = `Player 2: ${playerTwoName}`;
 
@@ -288,6 +323,8 @@ function listenToRoom() {
             setBoardColumns(roomData.boardSize);
             renderBoard();
 
+            updateGameInfoBar(roomData.boardSize);
+
             updateTurnControls();
 
             showGame();
@@ -296,6 +333,7 @@ function listenToRoom() {
                 resultMessageText.textContent = roomData.resultMessage || "Game over.";
                 playAgainButton.style.display = isHost ? "inline-block" : "none";
                 gamePanel.classList.add("hidden");
+                updateResultsPanel(roomData);
                 resultsPanel.classList.remove("hidden");
             }
         }
@@ -309,6 +347,14 @@ function listenToRoom() {
             }
         }
     });
+}
+
+function updateGameInfoBar(boardSize) {
+    const sideLength = Math.sqrt(boardSize);
+
+    gameBoardSizeLabel.textContent = `${sideLength} x ${sideLength}`;
+    gameCharacterCount.textContent = chosenCharacters.length;
+    gameDeckList.textContent = selectedDecks.join(", ");
 }
 
 function setupDisconnectHandling() {
@@ -327,6 +373,17 @@ function setupDisconnectHandling() {
             playerTwoFlippedCards: []
         });
     }
+}
+
+function copyRoomCode() {
+    if (!currentRoomCode) return;
+
+    navigator.clipboard.writeText(currentRoomCode).then(() => {
+        copyRoomCodeButton.textContent = "Copied!";
+        setTimeout(() => {
+            copyRoomCodeButton.textContent = "Copy";
+        }, 1200);
+    });
 }
 
 function updateTurnControls() {
@@ -453,6 +510,8 @@ function startGame() {
     setBoardColumns(boardSize);
 
     renderBoard();
+
+    updateGameInfoBar(boardSize);
 
     showGame();
 }
@@ -701,6 +760,44 @@ function toggleFlippedCard(characterName) {
     database.ref("rooms/" + currentRoomCode).update(updateData);
 }
 
+function updateResultsPanel(roomData) {
+    const p1Secret = getCharacterById(playerOneSecret);
+    const p2Secret = getCharacterById(playerTwoSecret);
+
+    const p1Won = roomData.winnerPlayer === 1;
+    const p2Won = roomData.winnerPlayer === 2;
+
+    resultPlayerOneName.textContent = playerOneName;
+    resultPlayerTwoName.textContent = playerTwoName;
+
+    resultPlayerOneStatus.textContent =
+        p1Won ? "WINNER" : "LOSER";
+
+    resultPlayerTwoStatus.textContent =
+        p2Won ? "WINNER" : "LOSER";
+
+    resultPlayerOneStatus.className =
+        p1Won ? "winner-label" : "loser-label";
+
+    resultPlayerTwoStatus.className =
+        p2Won ? "winner-label" : "loser-label";
+
+    resultPlayerOneSecret.textContent =
+        p1Secret?.displayName || "?";
+
+    resultPlayerTwoSecret.textContent =
+        p2Secret?.displayName || "?";
+
+    resultPlayerOneImage.src =
+        p1Secret?.image || "images/placeholder.png";
+
+    resultPlayerTwoImage.src =
+        p2Secret?.image || "images/placeholder.png";
+
+    resultPlayerOneScore.textContent = roomData.playerOneWins || 0;
+    resultPlayerTwoScore.textContent = roomData.playerTwoWins || 0;
+}
+
 function getRandomCharacters(amount) {
     const deckPools = selectedDecks.map((deck) => {
         const charactersForDeck = CHARACTERS
@@ -813,19 +910,32 @@ function endTurn() {
     });
 }
 
-function guessCharacter(characterName) {
+function guessCharacter(characterId) {
     if (gameOver) return;
     if (!isMyTurn()) return;
 
-    const guessedCharacter = getCharacterDisplayNameById(characterName);
+    const guessedCharacter = getCharacterById(characterId);
 
-    const confirmed = confirm(
-        `Guess ${guessedCharacter}?\n\nIf correct, you win.\nIf wrong, you lose.`
-    );
+    if (!guessedCharacter) return;
 
-    if (!confirmed) {
-        return;
-    }
+    pendingGuessCharacterId = characterId;
+
+    guessConfirmName.textContent = guessedCharacter.displayName;
+    guessConfirmImage.src = guessedCharacter.image || "images/placeholder.png";
+
+    guessConfirmModal.classList.remove("hidden");
+}
+
+function closeGuessConfirmModal() {
+    pendingGuessCharacterId = "";
+    guessConfirmModal.classList.add("hidden");
+}
+
+function confirmPendingGuess() {
+    if (!pendingGuessCharacterId) return;
+
+    const characterId = pendingGuessCharacterId;
+    closeGuessConfirmModal();
 
     const opponentSecret =
         currentTurn === 1 ? playerTwoSecret : playerOneSecret;
@@ -836,17 +946,37 @@ function guessCharacter(characterName) {
     const opponentName =
         currentTurn === 1 ? playerTwoName : playerOneName;
 
+        
+
     let resultText = "";
 
-    if (characterName === opponentSecret) {
-        resultText = `${currentPlayerName} guessed correctly and wins!`;
-    } else {
-        resultText = `${currentPlayerName} guessed wrong! ${opponentName} wins!`;
+    let winnerPlayer;
+
+    if (characterId === opponentSecret) {
+        resultText =
+            `${currentPlayerName} guessed correctly and wins!`;
+
+        winnerPlayer = currentTurn;
     }
+    else {
+        resultText =
+            `${currentPlayerName} guessed wrong! ${opponentName} wins!`;
+
+        winnerPlayer = currentTurn === 1 ? 2 : 1;
+    }
+
+    const newPlayerOneWins =
+        winnerPlayer === 1 ? playerOneWins + 1 : playerOneWins;
+
+    const newPlayerTwoWins =
+        winnerPlayer === 2 ? playerTwoWins + 1 : playerTwoWins;
 
     database.ref("rooms/" + currentRoomCode).update({
         gameOver: true,
-        resultMessage: resultText
+        resultMessage: resultText,
+        winnerPlayer: winnerPlayer,
+        playerOneWins: newPlayerOneWins,
+        playerTwoWins: newPlayerTwoWins
     });
 }
 
