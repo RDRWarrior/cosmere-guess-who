@@ -280,7 +280,7 @@ function listenToRoom() {
 
             if (playerRole === "spectator") {
                 secretCharacterButton.textContent = "Spectating";
-                secretCharacterImage.src = "images/placeholder.png";
+                //secretCharacterImage.src = "images/placeholder.png";
             } else {
                 updateSecretCharacterDisplay();
             }
